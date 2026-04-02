@@ -1,6 +1,8 @@
 {
   "meta": {
-    "title": "Simulateur TCO voiture"
+    "title": "Simulateur TCO voiture : électrique vs thermique",
+    "description": "Estimez le coût total de possession (TCO) d'une voiture électrique face à un thermique ou diesel : énergie, entretien, assurance, financement et valeur de revente sur la même durée.",
+    "keywords": "TCO voiture, coût total de possession, simulateur, véhicule électrique, thermique, assurance, crédit auto, revente"
   },
   "common": {
     "years": "{n} ans",

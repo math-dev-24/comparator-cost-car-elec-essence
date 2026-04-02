@@ -1,6 +1,8 @@
 {
   "meta": {
-    "title": "Car TCO simulator"
+    "title": "Car TCO calculator: electric vs ICE",
+    "description": "Estimate the total cost of ownership (TCO) for an electric car vs ICE or diesel: energy, maintenance, insurance, financing, and resale value over the same period.",
+    "keywords": "car TCO, total cost of ownership, calculator, electric vehicle, ICE, insurance, car loan, resale"
   },
   "common": {
     "years": "{n} years",
