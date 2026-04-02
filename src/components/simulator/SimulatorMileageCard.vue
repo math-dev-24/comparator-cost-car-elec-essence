@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SliderField from '@/components/simulator/SliderField.vue'
+import { useLocaleFormat } from '@/composables/useLocaleFormat'
 import {
-  formatFrInt,
   KM_PER_YEAR_MAX,
   KM_PER_YEAR_MIN,
   useSimulatorStore,
@@ -9,30 +9,35 @@ import {
 import Card from 'primevue/card'
 import InputNumber from 'primevue/inputnumber'
 import SelectButton from 'primevue/selectbutton'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 defineOptions({ name: 'SimulatorMileageCard' })
 
 const store = useSimulatorStore()
+const { t } = useI18n()
+const { tag, fmtInt } = useLocaleFormat()
 
-const mileageModeOptions = [
-  { label: 'Km/jour & jours/mois', value: 'trip' as const },
-  { label: 'Km/an par véhicule', value: 'direct' as const },
-]
+const mileageModeOptions = computed(() => [
+  { label: t('mileage.modeTrip'), value: 'trip' as const },
+  { label: t('mileage.modeDirect'), value: 'direct' as const },
+])
+
+const readoutApproxHtml = computed(() =>
+  t('mileage.readoutApprox', {
+    kmMonth: fmtInt(Math.round(store.distanceKmMonthFromTrip)),
+    kmYear: fmtInt(store.annualKmFromTrip),
+  }),
+)
 </script>
 
 <template>
   <Card class="sim-card">
-    <template #title>Kilométrage</template>
+    <template #title>{{ t('mileage.title') }}</template>
     <template #content>
-      <p class="card-intro mb-3">
-        Une seule logique à la fois, avec les <strong>mêmes bornes annuelles</strong> ({{ formatFrInt(KM_PER_YEAR_MIN) }}–{{
-          formatFrInt(KM_PER_YEAR_MAX)
-        }}
-        km/an). En mode trajet, l’électrique et le thermique partagent le même kilométrage annuel. En mode direct, vous
-        pouvez les différencier.
-      </p>
+      <p class="card-intro mb-3" v-html="t('mileage.intro', { kmMin: fmtInt(KM_PER_YEAR_MIN), kmMax: fmtInt(KM_PER_YEAR_MAX) })" />
       <div class="mb-4">
-        <label class="inlabel">Mode</label>
+        <label class="inlabel">{{ t('mileage.mode') }}</label>
         <SelectButton
           v-model="store.data.mileageInputMode"
           :options="mileageModeOptions"
@@ -43,10 +48,10 @@ const mileageModeOptions = [
       </div>
 
       <template v-if="store.data.mileageInputMode === 'trip'">
-        <p class="section-hint">Paramètres du trajet</p>
+        <p class="section-hint">{{ t('mileage.tripParams') }}</p>
         <SliderField
           v-model="store.data.kmPerDay"
-          label="Distance / jour (km)"
+          :label="t('mileage.kmPerDay')"
           :min="store.tripKmPerDayMin"
           :max="store.tripKmPerDayMax"
           :step="1"
@@ -54,45 +59,44 @@ const mileageModeOptions = [
         />
         <SliderField
           v-model="store.data.daysPerMonth"
-          label="Jours / mois"
+          :label="t('mileage.daysPerMonth')"
           :min="store.tripDaysMin"
           :max="store.tripDaysMax"
           :step="1"
-          :format="(v) => `${Math.round(v)} j`"
+          :format="(v) => `${Math.round(v)} ${t('mileage.daysShort')}`"
         />
         <div class="readout">
-          <p class="readout-main">
-            ≈ <strong>{{ formatFrInt(Math.round(store.distanceKmMonthFromTrip)) }} km</strong> / mois ·
-            <strong>{{ formatFrInt(store.annualKmFromTrip) }} km</strong> / an (identique pour les deux véhicules)
+          <p class="readout-main" v-html="readoutApproxHtml" />
+          <p class="readout-sub">
+            {{ t('mileage.readoutRange', { min: fmtInt(KM_PER_YEAR_MIN), max: fmtInt(KM_PER_YEAR_MAX) }) }}
           </p>
-          <p class="readout-sub">Plage km/an : {{ formatFrInt(KM_PER_YEAR_MIN) }}–{{ formatFrInt(KM_PER_YEAR_MAX) }} km</p>
         </div>
       </template>
 
       <template v-else>
-        <p class="section-hint">Km/an (saisie directe)</p>
+        <p class="section-hint">{{ t('mileage.directSection') }}</p>
         <SliderField
           v-model="store.data.evKmPerYear"
-          :label="`Km / an — ${store.data.evLabel}`"
+          :label="t('mileage.kmPerYear', { vehicle: store.data.evLabel })"
           :min="KM_PER_YEAR_MIN"
           :max="KM_PER_YEAR_MAX"
           :step="100"
-          :format="(v) => `${formatFrInt(v)} km`"
+          :format="(v) => `${fmtInt(v)} km`"
         />
         <SliderField
           v-model="store.data.iceKmPerYear"
-          :label="`Km / an — ${store.data.iceLabel}`"
+          :label="t('mileage.kmPerYear', { vehicle: store.data.iceLabel })"
           :min="KM_PER_YEAR_MIN"
           :max="KM_PER_YEAR_MAX"
           :step="100"
-          :format="(v) => `${formatFrInt(v)} km`"
+          :format="(v) => `${fmtInt(v)} km`"
         />
       </template>
 
-      <p class="section-hint mt-4">Compteur initial</p>
+      <p class="section-hint mt-4">{{ t('mileage.initialSection') }}</p>
       <div class="num-pair-grid">
         <div>
-          <label class="inlabel" for="ev-init-km">Km initiaux — {{ store.data.evLabel }}</label>
+          <label class="inlabel" for="ev-init-km">{{ t('mileage.initialKm', { vehicle: store.data.evLabel }) }}</label>
           <InputNumber
             id="ev-init-km"
             v-model="store.data.evInitialKm"
@@ -100,12 +104,12 @@ const mileageModeOptions = [
             :min="0"
             :max="500000"
             :step="1000"
-            locale="fr-FR"
+            :locale="tag"
             suffix=" km"
           />
         </div>
         <div>
-          <label class="inlabel" for="ice-init-km">Km initiaux — {{ store.data.iceLabel }}</label>
+          <label class="inlabel" for="ice-init-km">{{ t('mileage.initialKm', { vehicle: store.data.iceLabel }) }}</label>
           <InputNumber
             id="ice-init-km"
             v-model="store.data.iceInitialKm"
@@ -113,19 +117,23 @@ const mileageModeOptions = [
             :min="0"
             :max="500000"
             :step="1000"
-            locale="fr-FR"
+            :locale="tag"
             suffix=" km"
           />
         </div>
       </div>
       <div class="odom-grid">
         <div class="metric metric-inline">
-          <p class="metric-label">Compteur fin année {{ store.data.simulationYears }} — {{ store.data.evLabel }}</p>
-          <p class="metric-value metric-ev">{{ formatFrInt(store.evKmEndOfHorizon) }} km</p>
+          <p class="metric-label">
+            {{ t('mileage.odomEnd', { year: store.data.simulationYears, vehicle: store.data.evLabel }) }}
+          </p>
+          <p class="metric-value metric-ev">{{ fmtInt(store.evKmEndOfHorizon) }} km</p>
         </div>
         <div class="metric metric-inline">
-          <p class="metric-label">Compteur fin année {{ store.data.simulationYears }} — {{ store.data.iceLabel }}</p>
-          <p class="metric-value metric-fuel">{{ formatFrInt(store.iceKmEndOfHorizon) }} km</p>
+          <p class="metric-label">
+            {{ t('mileage.odomEnd', { year: store.data.simulationYears, vehicle: store.data.iceLabel }) }}
+          </p>
+          <p class="metric-value metric-fuel">{{ fmtInt(store.iceKmEndOfHorizon) }} km</p>
         </div>
       </div>
     </template>

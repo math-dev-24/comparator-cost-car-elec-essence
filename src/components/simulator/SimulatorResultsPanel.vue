@@ -1,131 +1,132 @@
 <script setup lang="ts">
 import SimulatorChart from '@/components/simulator/SimulatorChart.vue'
-import {
-  formatFrInt,
-  SIMULATOR_COLORS,
-  useSimulatorStore,
-} from '@/stores/simulator'
+import { useLocaleFormat } from '@/composables/useLocaleFormat'
+import { SIMULATOR_COLORS, useSimulatorStore } from '@/stores/simulator'
+import { useI18n } from 'vue-i18n'
 
 defineOptions({ name: 'SimulatorResultsPanel' })
 
 const store = useSimulatorStore()
+const { t } = useI18n()
+const { fmtInt } = useLocaleFormat()
 
 const y = () => store.data.simulationYears
 
-const monthlyElecRounded = () => formatFrInt(Math.round(store.totalElecMonth))
-const monthlyFuelRounded = () => formatFrInt(Math.round(store.totalFuelMonth))
-const monthlySavingsAbs = () => formatFrInt(Math.abs(Math.round(store.savingsMonth)))
-const savingsPeriodAbs = () => formatFrInt(Math.abs(store.savingsSimulation))
+const monthlyElecRounded = () => fmtInt(Math.round(store.totalElecMonth))
+const monthlyFuelRounded = () => fmtInt(Math.round(store.totalFuelMonth))
+const monthlySavingsAbs = () => fmtInt(Math.abs(Math.round(store.savingsMonth)))
+const savingsPeriodAbs = () => fmtInt(Math.abs(store.savingsSimulation))
 
 function deltaClass(n: number): string {
   if (n > 0) return 'delta-pos'
   if (n < 0) return 'delta-neg'
   return 'delta-zero'
 }
+
+function evLower() {
+  return store.data.evLabel.toLowerCase()
+}
+
+function iceLower() {
+  return store.data.iceLabel.toLowerCase()
+}
 </script>
 
 <template>
   <div class="results-root">
     <section class="verdict-hero" :class="deltaClass(store.savingsSimulation)">
-      <p class="verdict-label">Synthèse sur {{ y() }} ans (charges : énergie, entretien, assurance, crédit ou amort.)</p>
-      <p v-if="store.savingsSimulation > 0" class="verdict-title">
-        L’{{ store.data.evLabel.toLowerCase() }} revient <strong>moins cher</strong> que l’{{
-          store.data.iceLabel.toLowerCase()
-        }}
-      </p>
-      <p v-else-if="store.savingsSimulation < 0" class="verdict-title">
-        L’{{ store.data.iceLabel.toLowerCase() }} revient <strong>moins cher</strong> que l’{{
-          store.data.evLabel.toLowerCase()
-        }}
-      </p>
-      <p v-else class="verdict-title">Coûts proches sur la période</p>
+      <p class="verdict-label">{{ t('results.verdictLabel', { y: y() }) }}</p>
+      <p v-if="store.savingsSimulation > 0" class="verdict-title" v-html="t('results.verdictEvCheaper', { ev: evLower(), ice: iceLower() })" />
+      <p v-else-if="store.savingsSimulation < 0" class="verdict-title" v-html="t('results.verdictIceCheaper', { ev: evLower(), ice: iceLower() })" />
+      <p v-else class="verdict-title">{{ t('results.verdictClose') }}</p>
       <p class="verdict-amount">
         <template v-if="store.savingsSimulation !== 0">
-          Écart : <strong>{{ savingsPeriodAbs() }} €</strong>
+          {{ t('results.gapLabel') }} <strong>{{ savingsPeriodAbs() }} €</strong>
           <span class="verdict-hint">
-            ({{ store.savingsSimulation > 0 ? `économie avec l’${store.data.evLabel}` : `économie avec l’${store.data.iceLabel}` }})
+            ({{
+              store.savingsSimulation > 0
+                ? t('results.gapHintEv', { label: store.data.evLabel })
+                : t('results.gapHintIce', { label: store.data.iceLabel })
+            }})
           </span>
         </template>
-        <template v-else>Écart négligeable entre les deux scénarios.</template>
+        <template v-else>{{ t('results.gapNegligible') }}</template>
       </p>
     </section>
 
     <section class="kpi-row">
       <div class="kpi-card kpi-ev">
-        <p class="kpi-label">Total {{ store.data.evLabel }}</p>
-        <p class="kpi-value">{{ formatFrInt(store.totalSimulationElec) }} €</p>
-        <p class="kpi-sub">sur {{ y() }} ans cumulés</p>
+        <p class="kpi-label">{{ t('results.totalVehicle', { label: store.data.evLabel }) }}</p>
+        <p class="kpi-value">{{ fmtInt(store.totalSimulationElec) }} €</p>
+        <p class="kpi-sub">{{ t('results.cumulativeYears', { y: y() }) }}</p>
       </div>
       <div class="kpi-card kpi-ice">
-        <p class="kpi-label">Total {{ store.data.iceLabel }}</p>
-        <p class="kpi-value">{{ formatFrInt(store.totalSimulationFuel) }} €</p>
-        <p class="kpi-sub">sur {{ y() }} ans cumulés</p>
+        <p class="kpi-label">{{ t('results.totalVehicle', { label: store.data.iceLabel }) }}</p>
+        <p class="kpi-value">{{ fmtInt(store.totalSimulationFuel) }} €</p>
+        <p class="kpi-sub">{{ t('results.cumulativeYears', { y: y() }) }}</p>
       </div>
       <div class="kpi-card kpi-delta" :class="deltaClass(store.savingsSimulation)">
-        <p class="kpi-label">Écart (thermique − électrique)</p>
+        <p class="kpi-label">{{ t('results.deltaKpi') }}</p>
         <p class="kpi-value">
-          {{ store.savingsSimulation >= 0 ? '+' : '−' }}{{ formatFrInt(Math.abs(store.savingsSimulation)) }} €
+          {{ store.savingsSimulation >= 0 ? '+' : '−' }}{{ fmtInt(Math.abs(store.savingsSimulation)) }} €
         </p>
-        <p class="kpi-sub">positif = avantage {{ store.data.evLabel }}</p>
+        <p class="kpi-sub">{{ t('results.deltaKpiSub', { ev: store.data.evLabel }) }}</p>
       </div>
     </section>
 
     <section class="detail-grid">
       <div class="detail-card">
-        <p class="detail-title">Moyenne 1ʳᵉ année</p>
+        <p class="detail-title">{{ t('results.firstYearAvg') }}</p>
         <p class="detail-line">
           <span>{{ store.data.evLabel }}</span>
-          <span class="detail-ev">{{ monthlyElecRounded() }} € / mois</span>
+          <span class="detail-ev">{{ monthlyElecRounded() }} {{ t('results.perMonth') }}</span>
         </p>
         <p class="detail-line">
           <span>{{ store.data.iceLabel }}</span>
-          <span class="detail-ice">{{ monthlyFuelRounded() }} € / mois</span>
+          <span class="detail-ice">{{ monthlyFuelRounded() }} {{ t('results.perMonth') }}</span>
         </p>
         <p class="detail-line detail-delta">
-          <span>Écart mensuel</span>
+          <span>{{ t('results.monthlyGap') }}</span>
           <span :class="deltaClass(store.savingsMonth)">
             {{ store.savingsMonth >= 0 ? '+' : '−' }}{{ monthlySavingsAbs() }} €
           </span>
         </p>
       </div>
       <div class="detail-card">
-        <p class="detail-title">Usage seul (sans véhicule)</p>
+        <p class="detail-title">{{ t('results.usageOnly') }}</p>
         <p class="detail-line">
-          <span>Économie {{ y() }} ans</span>
+          <span>{{ t('results.savingsYears', { y: y() }) }}</span>
           <span :class="deltaClass(store.savingsRunningOnly)">
             {{ store.savingsRunningOnly >= 0 ? '+' : '−'
-            }}{{ formatFrInt(Math.abs(store.savingsRunningOnly)) }} €
+            }}{{ fmtInt(Math.abs(store.savingsRunningOnly)) }} €
           </span>
         </p>
-        <p class="detail-note">Énergie + entretien + assurance, sans crédit ni amortissement achat.</p>
+        <p class="detail-note">{{ t('results.usageNote') }}</p>
       </div>
       <div class="detail-card">
-        <p class="detail-title">Achat / vente (fin de période)</p>
+        <p class="detail-title">{{ t('results.buySellEnd') }}</p>
         <p class="detail-line">
-          <span>Equité nette estimée — {{ store.data.evLabel }}</span>
-          <span class="detail-ev">{{ formatFrInt(store.equityEvAtHorizon) }} €</span>
+          <span>{{ t('results.equityEv', { label: store.data.evLabel }) }}</span>
+          <span class="detail-ev">{{ fmtInt(store.equityEvAtHorizon) }} €</span>
         </p>
         <p class="detail-line">
-          <span>Equité nette estimée — {{ store.data.iceLabel }}</span>
-          <span class="detail-ice">{{ formatFrInt(store.equityIceAtHorizon) }} €</span>
+          <span>{{ t('results.equityIce', { label: store.data.iceLabel }) }}</span>
+          <span class="detail-ice">{{ fmtInt(store.equityIceAtHorizon) }} €</span>
         </p>
         <p class="detail-line detail-delta">
-          <span>Écart (élec − therm.)</span>
+          <span>{{ t('results.equityGap') }}</span>
           <span :class="deltaClass(store.equityDeltaAtHorizon)">
             {{
               store.equityDeltaAtHorizon >= 0 ? '+' : '−'
-            }}{{ formatFrInt(Math.abs(store.equityDeltaAtHorizon)) }} €
+            }}{{ fmtInt(Math.abs(store.equityDeltaAtHorizon)) }} €
           </span>
         </p>
-        <p class="detail-note">
-          Valeur de reprise linéaire − crédit restant (si prêt). Positif = meilleure position côté
-          {{ store.data.evLabel }} à la revente.
-        </p>
+        <p class="detail-note">{{ t('results.equityNote', { ev: store.data.evLabel }) }}</p>
       </div>
     </section>
 
     <div class="chart-legend-block">
-      <p class="chart-legend-title">Graphique — coûts cumulés</p>
+      <p class="chart-legend-title">{{ t('results.chartLegendTitle') }}</p>
       <div class="legend">
         <span
           ><span class="legend-dot" :style="{ background: SIMULATOR_COLORS.fuel }" />{{
@@ -136,8 +137,9 @@ function deltaClass(n: number): string {
           ><span class="legend-dot" :style="{ background: SIMULATOR_COLORS.ev }" />{{ store.data.evLabel }}</span
         >
         <span
-          ><span class="legend-dot" :style="{ background: SIMULATOR_COLORS.savings }" />Écart cumulé (therm. −
-          élec.) — au-dessus de 0 = avantage électrique</span
+          ><span class="legend-dot" :style="{ background: SIMULATOR_COLORS.savings }" />{{
+            t('results.chartLegendCumulative')
+          }}</span
         >
       </div>
     </div>

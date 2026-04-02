@@ -2,43 +2,54 @@
 import { SIMULATION_YEAR_OPTIONS, useSimulatorStore } from '@/stores/simulator'
 import InputText from 'primevue/inputtext'
 import Select from 'primevue/select'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 defineOptions({ name: 'SimulatorHeader' })
 
 const store = useSimulatorStore()
+const { t, locale } = useI18n()
 
-const simulationYearOptions = SIMULATION_YEAR_OPTIONS.map((n) => ({
-  label: `${n} ans`,
-  value: n,
-}))
+const simulationYearOptions = computed(() =>
+  SIMULATION_YEAR_OPTIONS.map((n) => ({
+    label: t('common.years', { n }),
+    value: n,
+  })),
+)
+
+function setLang(lang: 'fr' | 'en') {
+  locale.value = lang
+}
 </script>
 
 <template>
   <header class="sim-header">
-    <div class="sim-title-block">
-      <h1 class="sim-h1">TCO simulateur</h1>
-      <p class="sim-sub">
-        Pour estimer si passer à l’électrique vaut le coup : comparez usage (énergie, entretien, assurance), financement et
-        valeur à la revente sur la même durée. Habituellement : votre thermique / diesel actuel face au véhicule électrique
-        envisagé.
-      </p>
+    <div class="sim-title-row">
+      <div class="sim-title-block">
+        <h1 class="sim-h1">{{ t('header.title') }}</h1>
+        <p class="sim-sub">{{ t('header.subtitle') }}</p>
+      </div>
+      <div class="lang-switch" role="group" :aria-label="t('header.langAria')">
+        <button type="button" class="lang-btn" :class="{ active: locale === 'fr' }" @click="setLang('fr')">FR</button>
+        <button type="button" class="lang-btn" :class="{ active: locale === 'en' }" @click="setLang('en')">EN</button>
+      </div>
     </div>
 
-    <div class="vehicle-row" aria-label="Libellés de comparaison">
+    <div class="vehicle-row" :aria-label="t('header.comparisonAria')">
       <div class="vehicle-field">
-        <label class="vehicle-field-label" for="ev-name">Véhicule électrique</label>
+        <label class="vehicle-field-label" for="ev-name">{{ t('header.evField') }}</label>
         <InputText id="ev-name" v-model="store.data.evLabel" class="vehicle-input w-full" autocomplete="off" />
       </div>
-      <span class="vehicle-vs">vs</span>
+      <span class="vehicle-vs">{{ t('common.vs') }}</span>
       <div class="vehicle-field">
-        <label class="vehicle-field-label" for="ice-name">Thermique</label>
+        <label class="vehicle-field-label" for="ice-name">{{ t('header.iceField') }}</label>
         <InputText id="ice-name" v-model="store.data.iceLabel" class="vehicle-input w-full" autocomplete="off" />
       </div>
     </div>
 
-    <div class="horizon-bar" role="group" aria-label="Horizon de simulation">
+    <div class="horizon-bar" role="group" :aria-label="t('header.horizonAria')">
       <div class="horizon-bar-inner">
-        <label class="horizon-label" for="header-sim-years">Horizon de comparaison</label>
+        <label class="horizon-label" for="header-sim-years">{{ t('header.horizonLabel') }}</label>
         <Select
           id="header-sim-years"
           v-model="store.data.simulationYears"
@@ -48,10 +59,7 @@ const simulationYearOptions = SIMULATION_YEAR_OPTIONS.map((n) => ({
           class="horizon-select"
         />
       </div>
-      <p class="horizon-hint">
-        Durée sur laquelle sont calculés le tableau annuel, le graphique et la perte de valeur (achat − revente). Indépendant
-        de la durée du crédit, réglée dans l’onglet Financement.
-      </p>
+      <p class="horizon-hint">{{ t('header.horizonHint') }}</p>
     </div>
   </header>
 </template>
@@ -61,8 +69,53 @@ const simulationYearOptions = SIMULATION_YEAR_OPTIONS.map((n) => ({
   margin-bottom: 0.75rem;
 }
 
-.sim-title-block {
+.sim-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
   margin-bottom: 1rem;
+}
+
+.sim-title-block {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.lang-switch {
+  display: inline-flex;
+  border-radius: 8px;
+  border: 1px solid rgba(26, 26, 24, 0.12);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.lang-btn {
+  margin: 0;
+  padding: 0.35rem 0.65rem;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border: none;
+  background: transparent;
+  color: #5f5e5a;
+  cursor: pointer;
+}
+
+.lang-btn + .lang-btn {
+  border-left: 1px solid rgba(26, 26, 24, 0.12);
+}
+
+.lang-btn:hover {
+  color: #1a1a18;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.lang-btn.active {
+  background: #1a1a18;
+  color: #f5f4f0;
 }
 
 .sim-h1 {

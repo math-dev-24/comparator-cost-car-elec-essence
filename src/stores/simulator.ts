@@ -24,14 +24,6 @@ const ABS_KM_DAY_MAX = 200
 const ABS_DAYS_MIN = 5
 const ABS_DAYS_MAX = 31
 
-export function formatFrInt(n: number): string {
-    return Math.round(n).toLocaleString('fr-FR')
-}
-
-export function formatFrDec(n: number, digits: number): string {
-    return n.toFixed(digits).replace('.', ',')
-}
-
 /** Mensualité crédit amortissable (TAEG → mensuel), capital sur n mois */
 export function monthlyPaymentFromRate(principal: number, annualRatePercent: number, nMonths: number): number {
     if (principal <= 0 || nMonths <= 0) return 0
@@ -198,7 +190,7 @@ export const useSimulatorStore = defineStore('simulator', () => {
         if (data.mileageInputMode !== 'trip') return
         let safety = 0
         while (safety++ < 48) {
-            let kdMin = Math.max(ABS_KM_DAY_MIN, Math.ceil(KM_PER_YEAR_MIN / (data.daysPerMonth * 12)))
+            const kdMin = Math.max(ABS_KM_DAY_MIN, Math.ceil(KM_PER_YEAR_MIN / (data.daysPerMonth * 12)))
             let kdMax = Math.min(ABS_KM_DAY_MAX, Math.floor(KM_PER_YEAR_MAX / (data.daysPerMonth * 12)))
             if (kdMax < kdMin) {
                 if (data.daysPerMonth < ABS_DAYS_MAX) {
@@ -209,7 +201,7 @@ export const useSimulatorStore = defineStore('simulator', () => {
             }
             data.kmPerDay = Math.min(Math.max(data.kmPerDay, kdMin), kdMax)
 
-            let dMin = Math.max(ABS_DAYS_MIN, Math.ceil(KM_PER_YEAR_MIN / (data.kmPerDay * 12)))
+            const dMin = Math.max(ABS_DAYS_MIN, Math.ceil(KM_PER_YEAR_MIN / (data.kmPerDay * 12)))
             let dMax = Math.min(ABS_DAYS_MAX, Math.floor(KM_PER_YEAR_MAX / (data.kmPerDay * 12)))
             if (dMax < dMin) {
                 if (data.kmPerDay < ABS_KM_DAY_MAX) {
@@ -463,7 +455,8 @@ export const useSimulatorStore = defineStore('simulator', () => {
     })
 
     const chartProjection = computed(() => {
-        const labels: string[] = []
+        /** Mois de l’axe X (1er du mois) — formatage localisé côté UI (vue-i18n), pas ici */
+        const monthStarts: Date[] = []
         const elec: number[] = []
         const fuel: number[] = []
         const eco: number[] = []
@@ -471,19 +464,14 @@ export const useSimulatorStore = defineStore('simulator', () => {
         let cumF = 0
         const cap = horizonMonths.value
         for (let m = 1; m <= cap; m++) {
-            const d = new Date(2025, 3 + m - 1, 1)
-            labels.push(
-                m === 1 || m % 6 === 0
-                    ? d.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' })
-                    : '',
-            )
+            monthStarts.push(new Date(2025, 3 + m - 1, 1))
             cumE += elecMonthTotal(m)
             cumF += fuelMonthTotal(m)
             elec.push(Math.round(cumE))
             fuel.push(Math.round(cumF))
             eco.push(Math.round(cumF - cumE))
         }
-        return { labels, elec, fuel, eco }
+        return { monthStarts, elec, fuel, eco }
     })
 
     function applyQuerySnapshot(patch: Record<string, unknown>): void {

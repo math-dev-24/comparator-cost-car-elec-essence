@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { formatFrInt, SIMULATOR_COLORS, useSimulatorStore } from '@/stores/simulator'
+import { useLocaleFormat } from '@/composables/useLocaleFormat'
+import { SIMULATOR_COLORS, useSimulatorStore } from '@/stores/simulator'
 import Card from 'primevue/card'
 import InputNumber from 'primevue/inputnumber'
+import { useI18n } from 'vue-i18n'
 
 defineOptions({ name: 'SimulatorPurchaseCard' })
 
 const store = useSimulatorStore()
+const { t } = useI18n()
+const { tag, fmtInt } = useLocaleFormat()
 
 const accent = {
   ev: SIMULATOR_COLORS.ev,
@@ -15,28 +19,23 @@ const accent = {
 
 <template>
   <Card class="sim-card">
-    <template #title>Achat & revente</template>
+    <template #title>{{ t('purchase.title') }}</template>
     <template #content>
-      <p class="card-intro">
-        Côté <strong>électrique</strong>, on indique le prix d’achat du projet et une revente estimée à
-        {{ store.data.simulationYears }} ans. Côté <strong>thermique</strong>, en général vous possédez déjà la voiture :
-        la revente à l’horizon est l’élément clé ; la valeur actuelle sert à étaler la décote sur la période (et au crédit
-        éventuel).
-      </p>
+      <p class="card-intro" v-html="t('purchase.intro', { years: store.data.simulationYears })" />
 
       <div class="purchase-encarts">
         <section
           class="purchase-encart purchase-encart--ev"
           :style="{ '--encart-accent': accent.ev }"
-          :aria-label="`Achat et revente — ${store.data.evLabel}`"
+          :aria-label="t('purchase.encartEvAria', { label: store.data.evLabel })"
         >
           <header class="encart-head">
             <h2 class="encart-title">{{ store.data.evLabel }}</h2>
-            <p class="encart-sub">Projet véhicule électrique</p>
+            <p class="encart-sub">{{ t('purchase.evSubtitle') }}</p>
           </header>
           <div class="encart-fields">
             <div>
-              <label class="inlabel">Prix d’achat</label>
+              <label class="inlabel">{{ t('purchase.purchasePrice') }}</label>
               <InputNumber
                 v-model="store.data.evPurchasePrice"
                 class="w-full inumber"
@@ -45,11 +44,11 @@ const accent = {
                 :step="500"
                 mode="currency"
                 currency="EUR"
-                locale="fr-FR"
+                :locale="tag"
               />
             </div>
             <div>
-              <label class="inlabel">Valeur de revente estimée dans {{ store.data.simulationYears }} ans</label>
+              <label class="inlabel">{{ t('purchase.resaleInYears', { years: store.data.simulationYears }) }}</label>
               <InputNumber
                 v-model="store.data.evReprise"
                 class="w-full inumber"
@@ -58,28 +57,28 @@ const accent = {
                 :step="500"
                 mode="currency"
                 currency="EUR"
-                locale="fr-FR"
+                :locale="tag"
               />
             </div>
           </div>
           <p class="encart-foot">
-            Décote sur la période :
-            <strong>{{ formatFrInt(store.data.evPurchasePrice - store.data.evReprise) }} €</strong>
+            {{ t('purchase.depreciationPeriod') }}
+            <strong>{{ fmtInt(store.data.evPurchasePrice - store.data.evReprise) }} €</strong>
           </p>
         </section>
 
         <section
           class="purchase-encart purchase-encart--ice"
           :style="{ '--encart-accent': accent.ice }"
-          :aria-label="`Revente thermique — ${store.data.iceLabel}`"
+          :aria-label="t('purchase.encartIceAria', { label: store.data.iceLabel })"
         >
           <header class="encart-head">
             <h2 class="encart-title">{{ store.data.iceLabel }}</h2>
-            <p class="encart-sub">Thermique / diesel (référence ou véhicule actuel)</p>
+            <p class="encart-sub">{{ t('purchase.iceSubtitle') }}</p>
           </header>
           <div class="encart-fields">
             <div>
-              <label class="inlabel">Valeur de revente estimée dans {{ store.data.simulationYears }} ans</label>
+              <label class="inlabel">{{ t('purchase.resaleInYears', { years: store.data.simulationYears }) }}</label>
               <InputNumber
                 v-model="store.data.iceReprise"
                 class="w-full inumber"
@@ -88,11 +87,11 @@ const accent = {
                 :step="500"
                 mode="currency"
                 currency="EUR"
-                locale="fr-FR"
+                :locale="tag"
               />
             </div>
             <div>
-              <label class="inlabel">Valeur actuelle du véhicule</label>
+              <label class="inlabel">{{ t('purchase.currentValue') }}</label>
               <InputNumber
                 v-model="store.data.icePurchasePrice"
                 class="w-full inumber"
@@ -101,24 +100,22 @@ const accent = {
                 :step="500"
                 mode="currency"
                 currency="EUR"
-                locale="fr-FR"
+                :locale="tag"
               />
-              <p class="field-micro">
-                Sert à calculer la perte de valeur mois par mois et le capital pour un crédit sur cette voiture.
-              </p>
+              <p class="field-micro">{{ t('purchase.fieldMicro') }}</p>
             </div>
           </div>
           <p class="encart-foot">
-            Décote sur la période :
-            <strong>{{ formatFrInt(store.data.icePurchasePrice - store.data.iceReprise) }} €</strong>
+            {{ t('purchase.depreciationPeriod') }}
+            <strong>{{ fmtInt(store.data.icePurchasePrice - store.data.iceReprise) }} €</strong>
           </p>
         </section>
       </div>
 
       <p class="hint mb-0">
-        Coût « véhicule » net sur l’horizon (achat ou valeur actuelle − revente) :
-        <strong class="metric-ev">{{ formatFrInt(store.netVehicleCostEv) }} €</strong> ({{ store.data.evLabel }}) ·
-        <strong class="metric-fuel">{{ formatFrInt(store.netVehicleCostIce) }} €</strong> ({{ store.data.iceLabel }})
+        {{ t('purchase.netVehicleHint') }}
+        <strong class="metric-ev">{{ fmtInt(store.netVehicleCostEv) }} €</strong> ({{ store.data.evLabel }}) ·
+        <strong class="metric-fuel">{{ fmtInt(store.netVehicleCostIce) }} €</strong> ({{ store.data.iceLabel }})
       </p>
     </template>
   </Card>

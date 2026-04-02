@@ -1,37 +1,40 @@
 <script setup lang="ts">
-import { FINANCING_DURATION_YEAR_OPTIONS, formatFrInt, useSimulatorStore } from '@/stores/simulator'
+import { useLocaleFormat } from '@/composables/useLocaleFormat'
+import { FINANCING_DURATION_YEAR_OPTIONS, useSimulatorStore } from '@/stores/simulator'
 import Card from 'primevue/card'
 import InputNumber from 'primevue/inputnumber'
 import InputSwitch from 'primevue/inputswitch'
 import Select from 'primevue/select'
 import SelectButton from 'primevue/selectbutton'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 defineOptions({ name: 'SimulatorFinancingCard' })
 
 const store = useSimulatorStore()
+const { t } = useI18n()
+const { tag, fmtInt } = useLocaleFormat()
 
-const financingYearOptions = FINANCING_DURATION_YEAR_OPTIONS.map((n) => ({
-  label: `${n} ans`,
-  value: n,
-}))
+const financingYearOptions = computed(() =>
+  FINANCING_DURATION_YEAR_OPTIONS.map((n) => ({
+    label: t('common.years', { n }),
+    value: n,
+  })),
+)
 
-const financeModeOptions = [
-  { label: 'Taux', value: true },
-  { label: 'Mensualité', value: false },
-]
+const financeModeOptions = computed(() => [
+  { label: t('financing.rateMode'), value: true },
+  { label: t('financing.paymentMode'), value: false },
+])
 </script>
 
 <template>
   <Card class="sim-card sim-card-highlight">
-    <template #title>Financement</template>
+    <template #title>{{ t('financing.title') }}</template>
     <template #content>
-      <p class="card-intro">
-        Durée du prêt (identique pour les deux véhicules) : mensualités pendant cette période, puis 0 €. Elle peut être
-        différente de l’<strong>horizon de comparaison</strong> (réglé sous les noms des véhicules). Sans crédit : part
-        « véhicule » = amortissement linéaire sur l’horizon (d’après les montants de l’onglet Achat / vente).
-      </p>
+      <p class="card-intro" v-html="t('financing.intro')" />
       <div class="finance-duration-row">
-        <label class="inlabel finance-label" for="fin-years">Durée du crédit</label>
+        <label class="inlabel finance-label" for="fin-years">{{ t('financing.creditDuration') }}</label>
         <Select
           id="fin-years"
           v-model="store.data.financingDurationYears"
@@ -45,7 +48,7 @@ const financeModeOptions = [
         <fieldset class="finance-fieldset">
           <legend class="finance-legend">{{ store.data.evLabel }}</legend>
           <div class="finance-row-switch">
-            <label for="ev-fin" class="switch-label">Financement</label>
+            <label for="ev-fin" class="switch-label">{{ t('financing.financingSwitch') }}</label>
             <InputSwitch id="ev-fin" v-model="store.data.evUseFinancing" />
           </div>
           <template v-if="store.data.evUseFinancing">
@@ -60,7 +63,7 @@ const financeModeOptions = [
               />
             </div>
             <template v-if="store.data.evFinanceUseRate">
-              <label class="inlabel">TAEG (% / an)</label>
+              <label class="inlabel">{{ t('financing.taeg') }}</label>
               <InputNumber
                 v-model="store.data.evAnnualRatePercent"
                 class="w-full inumber mb-2"
@@ -69,15 +72,15 @@ const financeModeOptions = [
                 :min-fraction-digits="1"
                 :max-fraction-digits="2"
                 suffix=" %"
-                locale="fr-FR"
+                :locale="tag"
               />
               <p class="hint mb-0">
-                Mensualité calculée :
-                <strong>{{ formatFrInt(Math.round(store.evMonthlyPayment)) }} €</strong>
+                {{ t('financing.monthlyComputed') }}
+                <strong>{{ fmtInt(Math.round(store.evMonthlyPayment)) }} €</strong>
               </p>
             </template>
             <template v-else>
-              <label class="inlabel">Mensualité (saisie)</label>
+              <label class="inlabel">{{ t('financing.monthlyInput') }}</label>
               <InputNumber
                 v-model="store.data.evMonthlyPaymentInput"
                 class="w-full inumber"
@@ -86,16 +89,16 @@ const financeModeOptions = [
                 :step="10"
                 mode="currency"
                 currency="EUR"
-                locale="fr-FR"
+                :locale="tag"
               />
-              <p class="hint mb-0">Sans intérêts (capital linéaire).</p>
+              <p class="hint mb-0">{{ t('financing.noInterestHint') }}</p>
             </template>
           </template>
         </fieldset>
         <fieldset class="finance-fieldset">
           <legend class="finance-legend">{{ store.data.iceLabel }}</legend>
           <div class="finance-row-switch">
-            <label for="ice-fin" class="switch-label">Financement</label>
+            <label for="ice-fin" class="switch-label">{{ t('financing.financingSwitch') }}</label>
             <InputSwitch id="ice-fin" v-model="store.data.iceUseFinancing" />
           </div>
           <template v-if="store.data.iceUseFinancing">
@@ -110,7 +113,7 @@ const financeModeOptions = [
               />
             </div>
             <template v-if="store.data.iceFinanceUseRate">
-              <label class="inlabel">TAEG (% / an)</label>
+              <label class="inlabel">{{ t('financing.taeg') }}</label>
               <InputNumber
                 v-model="store.data.iceAnnualRatePercent"
                 class="w-full inumber mb-2"
@@ -119,15 +122,15 @@ const financeModeOptions = [
                 :min-fraction-digits="1"
                 :max-fraction-digits="2"
                 suffix=" %"
-                locale="fr-FR"
+                :locale="tag"
               />
               <p class="hint mb-0">
-                Mensualité calculée :
-                <strong>{{ formatFrInt(Math.round(store.iceMonthlyPayment)) }} €</strong>
+                {{ t('financing.monthlyComputed') }}
+                <strong>{{ fmtInt(Math.round(store.iceMonthlyPayment)) }} €</strong>
               </p>
             </template>
             <template v-else>
-              <label class="inlabel">Mensualité (saisie)</label>
+              <label class="inlabel">{{ t('financing.monthlyInput') }}</label>
               <InputNumber
                 v-model="store.data.iceMonthlyPaymentInput"
                 class="w-full inumber"
@@ -136,9 +139,9 @@ const financeModeOptions = [
                 :step="10"
                 mode="currency"
                 currency="EUR"
-                locale="fr-FR"
+                :locale="tag"
               />
-              <p class="hint mb-0">Sans intérêts (capital linéaire).</p>
+              <p class="hint mb-0">{{ t('financing.noInterestHint') }}</p>
             </template>
           </template>
         </fieldset>

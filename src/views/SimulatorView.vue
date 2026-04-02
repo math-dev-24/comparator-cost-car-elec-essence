@@ -8,16 +8,18 @@ import SimulatorMileageCard from '@/components/simulator/SimulatorMileageCard.vu
 import SimulatorPurchaseCard from '@/components/simulator/SimulatorPurchaseCard.vue'
 import SimulatorResultsPanel from '@/components/simulator/SimulatorResultsPanel.vue'
 import SimulatorYearlyTable from '@/components/simulator/SimulatorYearlyTable.vue'
+import { useSimulatorQuerySync } from '@/composables/useSimulatorQuerySync'
 import Tab from 'primevue/tab'
 import TabList from 'primevue/tablist'
 import TabPanel from 'primevue/tabpanel'
 import TabPanels from 'primevue/tabpanels'
 import Tabs from 'primevue/tabs'
-import { useSimulatorQuerySync } from '@/composables/useSimulatorQuerySync'
+import { useI18n } from 'vue-i18n'
 
 defineOptions({ name: 'SimulatorView' })
 
 const { activeTab } = useSimulatorQuerySync()
+const { t } = useI18n()
 </script>
 
 <template>
@@ -26,11 +28,11 @@ const { activeTab } = useSimulatorQuerySync()
 
     <Tabs v-model:value="activeTab" scrollable class="sim-tabs">
       <TabList>
-        <Tab value="financing">Financement</Tab>
-        <Tab value="mileage">Kilométrage</Tab>
-        <Tab value="purchase">Achat / vente</Tab>
-        <Tab value="costs">Coûts</Tab>
-        <Tab value="results">Résultat</Tab>
+        <Tab value="financing">{{ t('tabs.financing') }}</Tab>
+        <Tab value="mileage">{{ t('tabs.mileage') }}</Tab>
+        <Tab value="purchase">{{ t('tabs.purchase') }}</Tab>
+        <Tab value="costs">{{ t('tabs.costs') }}</Tab>
+        <Tab value="results">{{ t('tabs.results') }}</Tab>
       </TabList>
       <TabPanels>
         <TabPanel value="financing">

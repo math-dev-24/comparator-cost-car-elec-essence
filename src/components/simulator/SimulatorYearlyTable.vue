@@ -1,16 +1,20 @@
 <script setup lang="ts">
-import { formatFrInt, useSimulatorStore } from '@/stores/simulator'
+import { useLocaleFormat } from '@/composables/useLocaleFormat'
+import { useSimulatorStore } from '@/stores/simulator'
 import Card from 'primevue/card'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
+import { useI18n } from 'vue-i18n'
 
 defineOptions({ name: 'SimulatorYearlyTable' })
 
 const store = useSimulatorStore()
+const { t } = useI18n()
+const { fmtInt } = useLocaleFormat()
 
 function formatDelta(n: number): string {
   const v = Math.round(n)
-  const s = formatFrInt(Math.abs(v))
+  const s = fmtInt(Math.abs(v))
   if (v > 0) return `+${s}`
   if (v < 0) return `−${s}`
   return s
@@ -25,22 +29,14 @@ function cellDeltaClass(n: number): string {
 
 <template>
   <Card class="sim-card">
-    <template #title>Détail par année ({{ store.data.simulationYears }} ans)</template>
+    <template #title>{{ t('yearly.title', { n: store.data.simulationYears }) }}</template>
     <template #content>
       <div class="legend-box">
-        <p class="legend-title">Comment lire le tableau</p>
+        <p class="legend-title">{{ t('yearly.howToRead') }}</p>
         <ul class="legend-list">
-          <li>
-            <strong>Coût {{ store.data.evLabel }} / {{ store.data.iceLabel }}</strong> : énergie + entretien +
-            assurance + mensualités de crédit <em>ou</em> amortissement linéaire (achat − reprise) sur l’horizon
-            choisi.
-          </li>
-          <li>
-            <strong>Δ / an</strong> : coût thermique − coût électrique.
-            <span class="pos-ex">Positif</span> = cette année l’électrique coûte <strong>moins cher</strong> (gain).
-            <span class="neg-ex">Négatif</span> = l’électrique coûte <strong>plus cher</strong> (perte vs thermique).
-          </li>
-          <li><strong>Δ cumulé</strong> : somme des Δ / an — même signe : avantage cumulé pour l’électrique si positif.</li>
+          <li v-html="t('yearly.legendCost', { ev: store.data.evLabel, ice: store.data.iceLabel })" />
+          <li v-html="t('yearly.legendDelta')" />
+          <li v-html="t('yearly.legendCumul')" />
         </ul>
       </div>
 
@@ -52,41 +48,45 @@ function cellDeltaClass(n: number): string {
         scroll-height="400px"
         class="year-table"
       >
-        <Column field="year" header="Année" frozen style="width: 4rem" />
-        <Column field="evKm" :header="`Km ${store.data.evLabel}`">
-          <template #body="{ data }">{{ formatFrInt(data.evKm) }}</template>
+        <Column field="year" :header="t('yearly.colYear')" frozen style="width: 4rem" />
+        <Column field="evKm" :header="t('yearly.colKm', { label: store.data.evLabel })">
+          <template #body="{ data }">{{ fmtInt(data.evKm) }}</template>
         </Column>
-        <Column field="iceKm" :header="`Km ${store.data.iceLabel}`">
-          <template #body="{ data }">{{ formatFrInt(data.iceKm) }}</template>
+        <Column field="iceKm" :header="t('yearly.colKm', { label: store.data.iceLabel })">
+          <template #body="{ data }">{{ fmtInt(data.iceKm) }}</template>
         </Column>
-        <Column header="Coût élec (énergie, maint., crédit/amort.)">
+        <Column :header="t('yearly.colCostElec')">
           <template #body="{ data }">
             <div class="cost-cell">
-              <span class="cost-main">{{ formatFrInt(data.evCostYear) }} €</span>
-              <span class="cost-detail"
-                >dont usage {{ formatFrInt(data.evUsageYear) }} € · véh.
-                {{ formatFrInt(data.evVehicleYear) }} €</span
-              >
+              <span class="cost-main">{{ fmtInt(data.evCostYear) }} €</span>
+              <span class="cost-detail">{{
+                t('yearly.costDetail', {
+                  usage: fmtInt(data.evUsageYear),
+                  vehicle: fmtInt(data.evVehicleYear),
+                })
+              }}</span>
             </div>
           </template>
         </Column>
-        <Column header="Coût essence (énergie, maint., crédit/amort.)">
+        <Column :header="t('yearly.colCostIce')">
           <template #body="{ data }">
             <div class="cost-cell">
-              <span class="cost-main">{{ formatFrInt(data.iceCostYear) }} €</span>
-              <span class="cost-detail"
-                >dont usage {{ formatFrInt(data.iceUsageYear) }} € · véh.
-                {{ formatFrInt(data.iceVehicleYear) }} €</span
-              >
+              <span class="cost-main">{{ fmtInt(data.iceCostYear) }} €</span>
+              <span class="cost-detail">{{
+                t('yearly.costDetail', {
+                  usage: fmtInt(data.iceUsageYear),
+                  vehicle: fmtInt(data.iceVehicleYear),
+                })
+              }}</span>
             </div>
           </template>
         </Column>
-        <Column header="Δ / an (therm. − élec.)">
+        <Column :header="t('yearly.colDelta')">
           <template #body="{ data }">
             <span class="delta-cell" :class="cellDeltaClass(data.deltaYear)">{{ formatDelta(data.deltaYear) }} €</span>
           </template>
         </Column>
-        <Column header="Δ cumulé">
+        <Column :header="t('yearly.colDeltaCumul')">
           <template #body="{ data }">
             <span class="delta-cell" :class="cellDeltaClass(data.deltaCumulative)">{{
               formatDelta(data.deltaCumulative)
@@ -97,24 +97,29 @@ function cellDeltaClass(n: number): string {
       </DataTable>
 
       <div class="totals-footer" :class="cellDeltaClass(store.savingsSimulation)">
-        <p class="totals-title">Bilan sur {{ store.data.simulationYears }} ans (achat, utilisation, revente modélisée)</p>
-        <p v-if="store.savingsSimulation > 0" class="totals-text">
-          Avec vos hypothèses, le véhicule <strong>{{ store.data.evLabel }}</strong> représente un coût total de charges
-          inférieur de <strong>{{ formatFrInt(store.savingsSimulation) }} €</strong> par rapport au
-          {{ store.data.iceLabel }} sur la période.
-        </p>
-        <p v-else-if="store.savingsSimulation < 0" class="totals-text">
-          Avec vos hypothèses, le véhicule <strong>{{ store.data.iceLabel }}</strong> représente un coût total de charges
-          inférieur de <strong>{{ formatFrInt(Math.abs(store.savingsSimulation)) }} €</strong> par rapport à l’{{
-            store.data.evLabel
-          }}
-          sur la période.
-        </p>
-        <p v-else class="totals-text">Les deux scénarios sont très proches en coûts de charges sur la période.</p>
+        <p class="totals-title">{{ t('yearly.footerTitle', { y: store.data.simulationYears }) }}</p>
+        <p
+          v-if="store.savingsSimulation > 0"
+          class="totals-text"
+          v-html="t('yearly.footerEvWins', { ev: store.data.evLabel, ice: store.data.iceLabel, amount: fmtInt(store.savingsSimulation) })"
+        />
+        <p
+          v-else-if="store.savingsSimulation < 0"
+          class="totals-text"
+          v-html="t('yearly.footerIceWins', { ice: store.data.iceLabel, ev: store.data.evLabel, amount: fmtInt(Math.abs(store.savingsSimulation)) })"
+        />
+        <p v-else class="totals-text">{{ t('yearly.footerClose') }}</p>
         <p class="totals-sub">
-          Totaux cumulés : {{ formatFrInt(store.totalSimulationElec) }} € ({{ store.data.evLabel }}) ·
-          {{ formatFrInt(store.totalSimulationFuel) }} € ({{ store.data.iceLabel }}). Équité estimée à la revente (valeur
-          − crédit) : {{ formatFrInt(store.equityEvAtHorizon) }} € vs {{ formatFrInt(store.equityIceAtHorizon) }} €.
+          {{
+            t('yearly.footerSub', {
+              totalEv: fmtInt(store.totalSimulationElec),
+              ev: store.data.evLabel,
+              totalIce: fmtInt(store.totalSimulationFuel),
+              ice: store.data.iceLabel,
+              eqEv: fmtInt(store.equityEvAtHorizon),
+              eqIce: fmtInt(store.equityIceAtHorizon),
+            })
+          }}
         </p>
       </div>
     </template>

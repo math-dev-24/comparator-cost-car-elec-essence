@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "title": "Car TCO simulator"
+  },
+  "common": {
+    "years": "{n} years",
+    "vs": "vs"
+  },
+  "tabs": {
+    "financing": "Financing",
+    "mileage": "Mileage",
+    "purchase": "Buy / sell",
+    "costs": "Costs",
+    "results": "Results"
+  },
+  "header": {
+    "langAria": "Language",
+    "title": "TCO car simulator",
+    "subtitle": "To see if switching to electric pays off: compare running costs (energy, maintenance, insurance), financing, and resale value over the same period. Typical use case: your current ICE / diesel vs the electric vehicle you are considering.",
+    "comparisonAria": "Comparison names",
+    "evField": "Electric vehicle",
+    "iceField": "ICE",
+    "horizonAria": "Simulation horizon",
+    "horizonLabel": "Comparison horizon",
+    "horizonHint": "Period used for the yearly table, chart, and depreciation (purchase − resale). Independent of loan length, which is set under Financing."
+  },
+  "financing": {
+    "title": "Financing",
+    "intro": "Loan length is the same for both vehicles: monthly payments during that period, then €0. It can differ from the <strong>comparison horizon</strong> (set under the vehicle names). Without a loan: the “vehicle” share is straight-line depreciation over the horizon (from Buy / sell amounts).",
+    "creditDuration": "Loan term",
+    "financingSwitch": "Financing",
+    "rateMode": "APR",
+    "paymentMode": "Monthly payment",
+    "taeg": "APR (% / year)",
+    "monthlyComputed": "Calculated monthly payment:",
+    "monthlyInput": "Monthly payment (input)",
+    "noInterestHint": "No interest (linear principal)."
+  },
+  "purchase": {
+    "title": "Purchase & resale",
+    "intro": "For the <strong>electric</strong> side, enter the purchase price and estimated resale after {years} years. For <strong>ICE</strong>, you often already own the car: resale at the horizon is the key input; current value spreads depreciation over the period (and any loan).",
+    "encartEvAria": "Purchase and resale — {label}",
+    "encartIceAria": "ICE resale — {label}",
+    "evSubtitle": "Electric vehicle project",
+    "iceSubtitle": "ICE / diesel (reference or current car)",
+    "purchasePrice": "Purchase price",
+    "resaleInYears": "Estimated resale value in {years} years",
+    "currentValue": "Current vehicle value",
+    "fieldMicro": "Used for month-by-month depreciation and loan principal on this vehicle.",
+    "depreciationPeriod": "Depreciation over the period:",
+    "netVehicleHint": "Net “vehicle” cost over the horizon (purchase or current value − resale):"
+  },
+  "mileage": {
+    "title": "Mileage",
+    "intro": "One input mode at a time, using the <strong>same yearly bounds</strong> ({kmMin}–{kmMax} km/year). In trip mode, EV and ICE share the same annual mileage. In direct mode, you can set them separately.",
+    "mode": "Mode",
+    "modeTrip": "Km/day & days/month",
+    "modeDirect": "Km/year per vehicle",
+    "tripParams": "Trip parameters",
+    "kmPerDay": "Distance / day (km)",
+    "daysShort": "d",
+    "daysPerMonth": "Days / month",
+    "readoutApprox": "≈ <strong>{kmMonth} km</strong> / month · <strong>{kmYear} km</strong> / year (same for both vehicles)",
+    "readoutRange": "Km/year range: {min}–{max} km",
+    "directSection": "Km/year (direct input)",
+    "kmPerYear": "Km / year — {vehicle}",
+    "initialSection": "Starting odometer",
+    "initialKm": "Starting km — {vehicle}",
+    "odomEnd": "Odometer end of year {year} — {vehicle}"
+  },
+  "energy": {
+    "title": "Energy",
+    "elecConso": "EV consumption (kWh/100)",
+    "elecPrice": "Electricity price (€/kWh)",
+    "fuelConso": "Fuel consumption (L/100)",
+    "fuelPrice": "Fuel price (€/L)"
+  },
+  "maintenance": {
+    "title": "Annual maintenance",
+    "maintVehicle": "Maintenance {vehicle} (€/yr)"
+  },
+  "insurance": {
+    "title": "Annual insurance",
+    "insVehicle": "Insurance {vehicle} (€/yr)"
+  },
+  "results": {
+    "verdictLabel": "Summary over {y} years (costs: energy, maintenance, insurance, loan or depreciation)",
+    "verdictEvCheaper": "<strong>{ev}</strong> costs <strong>less</strong> overall than <strong>{ice}</strong>",
+    "verdictIceCheaper": "<strong>{ice}</strong> costs <strong>less</strong> overall than <strong>{ev}</strong>",
+    "verdictClose": "Costs are very close over the period",
+    "gapLabel": "Gap:",
+    "gapHintEv": "savings with the {label}",
+    "gapHintIce": "savings with the {label}",
+    "gapNegligible": "Negligible gap between the two scenarios.",
+    "totalVehicle": "Total {label}",
+    "cumulativeYears": "over {y} years (cumulative)",
+    "deltaKpi": "Gap (ICE − electric)",
+    "deltaKpiSub": "positive = advantage for {ev}",
+    "firstYearAvg": "First-year average",
+    "perMonth": "€ / month",
+    "monthlyGap": "Monthly gap",
+    "usageOnly": "Running costs only (no vehicle)",
+    "savingsYears": "{y}-year savings",
+    "usageNote": "Energy + maintenance + insurance, no loan or purchase depreciation.",
+    "buySellEnd": "Buy / sell (end of period)",
+    "equityEv": "Estimated net equity — {label}",
+    "equityIce": "Estimated net equity — {label}",
+    "equityGap": "Gap (EV − ICE)",
+    "equityNote": "Linear resale value − remaining loan (if any). Positive = stronger position for the {ev} at resale.",
+    "chartLegendTitle": "Chart — cumulative costs",
+    "chartLegendCumulative": "Cumulative gap (ICE − EV) — above 0 means an EV advantage"
+  },
+  "yearly": {
+    "title": "Year-by-year detail ({n} years)",
+    "howToRead": "How to read the table",
+    "legendCost": "<strong>Cost {ev} / {ice}</strong>: energy + maintenance + insurance + loan payments <em>or</em> straight-line depreciation (purchase − resale) over the chosen horizon.",
+    "legendDelta": "<strong>Δ / yr</strong>: ICE cost − electric cost. <span class=\"pos-ex\">Positive</span> = this year the EV is <strong>cheaper</strong> (gain). <span class=\"neg-ex\">Negative</span> = the EV is <strong>more expensive</strong> (vs ICE).",
+    "legendCumul": "<strong>Cumulative Δ</strong>: sum of yearly Δ — same sign: cumulative advantage for electric if positive.",
+    "colYear": "Year",
+    "colCostElec": "EV cost (energy, maint., loan/deprec.)",
+    "colCostIce": "ICE cost (energy, maint., loan/deprec.)",
+    "colDelta": "Δ / yr (ICE − EV)",
+    "colDeltaCumul": "Cumulative Δ",
+    "colKm": "Km {label}",
+    "costDetail": "incl. running {usage} € · vehicle {vehicle} €",
+    "footerTitle": "{y}-year balance (purchase, use, modelled resale)",
+    "footerEvWins": "With your assumptions, the <strong>{ev}</strong> has total charges <strong>{amount} €</strong> lower than the {ice} over the period.",
+    "footerIceWins": "With your assumptions, the <strong>{ice}</strong> has total charges <strong>{amount} €</strong> lower than the {ev} over the period.",
+    "footerClose": "The two scenarios are very close in total charges over the period.",
+    "footerSub": "Cumulative totals: {totalEv} € ({ev}) · {totalIce} € ({ice}). Estimated resale equity (value − loan): {eqEv} € vs {eqIce} €."
+  },
+  "chart": {
+    "savings": "Savings"
+  }
+}

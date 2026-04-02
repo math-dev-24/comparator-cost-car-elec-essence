@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "title": "Simulateur TCO voiture"
+  },
+  "common": {
+    "years": "{n} ans",
+    "vs": "vs"
+  },
+  "tabs": {
+    "financing": "Financement",
+    "mileage": "Kilométrage",
+    "purchase": "Achat / vente",
+    "costs": "Coûts",
+    "results": "Résultat"
+  },
+  "header": {
+    "langAria": "Langue",
+    "title": "TCO simulateur",
+    "subtitle": "Pour estimer si passer à l'électrique vaut le coup : comparez usage (énergie, entretien, assurance), financement et valeur à la revente sur la même durée. Habituellement : votre thermique / diesel actuel face au véhicule électrique envisagé.",
+    "comparisonAria": "Libellés de comparaison",
+    "evField": "Véhicule électrique",
+    "iceField": "Thermique",
+    "horizonAria": "Horizon de simulation",
+    "horizonLabel": "Horizon de comparaison",
+    "horizonHint": "Durée sur laquelle sont calculés le tableau annuel, le graphique et la perte de valeur (achat − revente). Indépendant de la durée du crédit, réglée dans l'onglet Financement."
+  },
+  "financing": {
+    "title": "Financement",
+    "intro": "Durée du prêt (identique pour les deux véhicules) : mensualités pendant cette période, puis 0 €. Elle peut être différente de l'<strong>horizon de comparaison</strong> (réglé sous les noms des véhicules). Sans crédit : part « véhicule » = amortissement linéaire sur l'horizon (d'après les montants de l'onglet Achat / vente).",
+    "creditDuration": "Durée du crédit",
+    "financingSwitch": "Financement",
+    "rateMode": "Taux",
+    "paymentMode": "Mensualité",
+    "taeg": "TAEG (% / an)",
+    "monthlyComputed": "Mensualité calculée :",
+    "monthlyInput": "Mensualité (saisie)",
+    "noInterestHint": "Sans intérêts (capital linéaire)."
+  },
+  "purchase": {
+    "title": "Achat & revente",
+    "intro": "Côté <strong>électrique</strong>, on indique le prix d'achat du projet et une revente estimée à {years} ans. Côté <strong>thermique</strong>, en général vous possédez déjà la voiture : la revente à l'horizon est l'élément clé ; la valeur actuelle sert à étaler la décote sur la période (et au crédit éventuel).",
+    "encartEvAria": "Achat et revente — {label}",
+    "encartIceAria": "Revente thermique — {label}",
+    "evSubtitle": "Projet véhicule électrique",
+    "iceSubtitle": "Thermique / diesel (référence ou véhicule actuel)",
+    "purchasePrice": "Prix d'achat",
+    "resaleInYears": "Valeur de revente estimée dans {years} ans",
+    "currentValue": "Valeur actuelle du véhicule",
+    "fieldMicro": "Sert à calculer la perte de valeur mois par mois et le capital pour un crédit sur cette voiture.",
+    "depreciationPeriod": "Décote sur la période :",
+    "netVehicleHint": "Coût « véhicule » net sur l'horizon (achat ou valeur actuelle − revente) :"
+  },
+  "mileage": {
+    "title": "Kilométrage",
+    "intro": "Une seule logique à la fois, avec les <strong>mêmes bornes annuelles</strong> ({kmMin}–{kmMax} km/an). En mode trajet, l'électrique et le thermique partagent le même kilométrage annuel. En mode direct, vous pouvez les différencier.",
+    "mode": "Mode",
+    "modeTrip": "Km/jour & jours/mois",
+    "modeDirect": "Km/an par véhicule",
+    "tripParams": "Paramètres du trajet",
+    "kmPerDay": "Distance / jour (km)",
+    "daysShort": "j",
+    "daysPerMonth": "Jours / mois",
+    "readoutApprox": "≈ <strong>{kmMonth} km</strong> / mois · <strong>{kmYear} km</strong> / an (identique pour les deux véhicules)",
+    "readoutRange": "Plage km/an : {min}–{max} km",
+    "directSection": "Km/an (saisie directe)",
+    "kmPerYear": "Km / an — {vehicle}",
+    "initialSection": "Compteur initial",
+    "initialKm": "Km initiaux — {vehicle}",
+    "odomEnd": "Compteur fin année {year} — {vehicle}"
+  },
+  "energy": {
+    "title": "Énergie",
+    "elecConso": "Conso électrique (kWh/100)",
+    "elecPrice": "Prix électricité (€/kWh)",
+    "fuelConso": "Conso essence (L/100)",
+    "fuelPrice": "Prix essence (€/L)"
+  },
+  "maintenance": {
+    "title": "Maintenance annuelle",
+    "maintVehicle": "Entretien {vehicle} (€/an)"
+  },
+  "insurance": {
+    "title": "Assurance annuelle",
+    "insVehicle": "Assurance {vehicle} (€/an)"
+  },
+  "results": {
+    "verdictLabel": "Synthèse sur {y} ans (charges : énergie, entretien, assurance, crédit ou amort.)",
+    "verdictEvCheaper": "L'{ev} revient <strong>moins cher</strong> que l'{ice}",
+    "verdictIceCheaper": "L'{ice} revient <strong>moins cher</strong> que l'{ev}",
+    "verdictClose": "Coûts proches sur la période",
+    "gapLabel": "Écart :",
+    "gapHintEv": "économie avec l'{label}",
+    "gapHintIce": "économie avec l'{label}",
+    "gapNegligible": "Écart négligeable entre les deux scénarios.",
+    "totalVehicle": "Total {label}",
+    "cumulativeYears": "sur {y} ans cumulés",
+    "deltaKpi": "Écart (thermique − électrique)",
+    "deltaKpiSub": "positif = avantage {ev}",
+    "firstYearAvg": "Moyenne 1ʳᵉ année",
+    "perMonth": "€ / mois",
+    "monthlyGap": "Écart mensuel",
+    "usageOnly": "Usage seul (sans véhicule)",
+    "savingsYears": "Économie {y} ans",
+    "usageNote": "Énergie + entretien + assurance, sans crédit ni amortissement achat.",
+    "buySellEnd": "Achat / vente (fin de période)",
+    "equityEv": "Equité nette estimée — {label}",
+    "equityIce": "Equité nette estimée — {label}",
+    "equityGap": "Écart (élec − therm.)",
+    "equityNote": "Valeur de reprise linéaire − crédit restant (si prêt). Positif = meilleure position côté {ev} à la revente.",
+    "chartLegendTitle": "Graphique — coûts cumulés",
+    "chartLegendCumulative": "Écart cumulé (therm. − élec.) — au-dessus de 0 = avantage électrique"
+  },
+  "yearly": {
+    "title": "Détail par année ({n} ans)",
+    "howToRead": "Comment lire le tableau",
+    "legendCost": "<strong>Coût {ev} / {ice}</strong> : énergie + entretien + assurance + mensualités de crédit <em>ou</em> amortissement linéaire (achat − reprise) sur l'horizon choisi.",
+    "legendDelta": "<strong>Δ / an</strong> : coût thermique − coût électrique. <span class=\"pos-ex\">Positif</span> = cette année l'électrique coûte <strong>moins cher</strong> (gain). <span class=\"neg-ex\">Négatif</span> = l'électrique coûte <strong>plus cher</strong> (perte vs thermique).",
+    "legendCumul": "<strong>Δ cumulé</strong> : somme des Δ / an — même signe : avantage cumulé pour l'électrique si positif.",
+    "colYear": "Année",
+    "colCostElec": "Coût élec (énergie, maint., crédit/amort.)",
+    "colCostIce": "Coût essence (énergie, maint., crédit/amort.)",
+    "colDelta": "Δ / an (therm. − élec.)",
+    "colDeltaCumul": "Δ cumulé",
+    "colKm": "Km {label}",
+    "costDetail": "dont usage {usage} € · véh. {vehicle} €",
+    "footerTitle": "Bilan sur {y} ans (achat, utilisation, revente modélisée)",
+    "footerEvWins": "Avec vos hypothèses, le véhicule <strong>{ev}</strong> représente un coût total de charges inférieur de <strong>{amount} €</strong> par rapport au {ice} sur la période.",
+    "footerIceWins": "Avec vos hypothèses, le véhicule <strong>{ice}</strong> représente un coût total de charges inférieur de <strong>{amount} €</strong> par rapport à l'{ev} sur la période.",
+    "footerClose": "Les deux scénarios sont très proches en coûts de charges sur la période.",
+    "footerSub": "Totaux cumulés : {totalEv} € ({ev}) · {totalIce} € ({ice}). Équité estimée à la revente (valeur − crédit) : {eqEv} € vs {eqIce} €."
+  },
+  "chart": {
+    "savings": "Économie"
+  }
+}
